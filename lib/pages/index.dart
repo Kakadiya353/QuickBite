@@ -1,0 +1,9 @@
+export 'bottomnav.dart';
+export 'details.dart';
+export 'home.dart';
+export 'login.dart';
+export 'onBoard.dart';
+export 'order.dart';
+export 'profile.dart';
+export 'splash.dart';
+export 'wallet.dart';
