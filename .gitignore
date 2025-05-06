@@ -1,3 +1,12 @@
+build/
+.dart_tool/
+.packages
+*.lock
+*.apk
+*.aab
+.idea/
+.vscode/
+
 # Flutter-related ignores
 build/
 .dart_tool/
