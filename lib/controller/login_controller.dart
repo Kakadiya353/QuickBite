@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:otp_text_field_v2/otp_field_v2.dart';
 import 'package:quickbite/pages/bottomnav.dart';
 import 'package:quickbite/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../model/user/user.dart';
 
 class LoginController extends GetxController {
@@ -77,14 +75,26 @@ class LoginController extends GetxController {
 
       return null;
     } catch (e) {
-      Get.snackbar('Error', e.toString(), colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
       return null;
     }
   }
 
   bool validateFields({required String name, required String number}) {
     if (name.isEmpty || number.isEmpty) {
-      Get.snackbar('Error', 'Please fill the fields', colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: 'Please fill the fields',
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
       return false;
     }
     return true;
@@ -107,13 +117,30 @@ class LoginController extends GetxController {
           response.body['message']?[0] == 'SMS sent successfully.') {
         otpFieldShown = true;
         otpSend = otp;
-        Get.snackbar('Success', 'OTP sent successfully',
-            colorText: Colors.green);
+        showCustomSnackBar(
+          title: 'Success',
+          message: 'OTP sent successfully',
+          icon: Icons.check_circle,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
       } else {
-        Get.snackbar('Error', 'OTP not sent', colorText: Colors.red);
+        showCustomSnackBar(
+          title: 'Error',
+          message: 'OTP not sent',
+          icon: Icons.error,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString(), colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
     } finally {
       update();
     }
@@ -122,7 +149,13 @@ class LoginController extends GetxController {
   void addUser() {
     try {
       if (otpSend == null || otpSend != otpEntered) {
-        Get.snackbar('Error', 'OTP is incorrect', colorText: Colors.red);
+        showCustomSnackBar(
+          title: 'Error',
+          message: 'OTP is incorrect',
+          icon: Icons.error,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.white,
+        );
         return;
       }
 
@@ -139,8 +172,13 @@ class LoginController extends GetxController {
       doc.set(user.toJson());
       box.write('loginUser', user.toJson());
 
-      Get.snackbar('Success', 'User added successfully',
-          colorText: Colors.green);
+      showCustomSnackBar(
+        title: 'Success',
+        message: 'User added successfully',
+        icon: Icons.check_circle,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
 
       registerNumberCtrl.clear();
       registerNameCtrl.clear();
@@ -148,7 +186,13 @@ class LoginController extends GetxController {
 
       Get.offAll(() => BottomNav());
     } catch (e) {
-      Get.snackbar('Error', e.toString(), colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -156,8 +200,13 @@ class LoginController extends GetxController {
     try {
       String phoneNo = loginNumberCtrl.text;
       if (phoneNo.isEmpty) {
-        Get.snackbar('Error', 'Please enter your phone number',
-            colorText: Colors.red);
+        showCustomSnackBar(
+          title: 'Error',
+          message: 'Please enter your phone number',
+          icon: Icons.error,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.white,
+        );
         return;
       }
 
@@ -174,25 +223,34 @@ class LoginController extends GetxController {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('documentId', userDoc.id);
 
-        // // Wait and then retrieve the document ID
-        // String? documentId = prefs.getString('documentId');
-        // if (documentId != null) {
-        //   print("Document ID: $documentId"); // This should print in the console
-        // } else {
-        //   print("Document ID not found.");
-        // }
-
         box.write('loginUser', userData);
 
         loginNumberCtrl.clear();
         Get.offAll(() => BottomNav());
-        Get.snackbar('Success', 'Login Successful', colorText: Colors.green);
+        showCustomSnackBar(
+          title: 'Success',
+          message: 'Login Successful',
+          icon: Icons.check_circle,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
       } else {
-        Get.snackbar('Error', 'User not found, please register',
-            colorText: Colors.red);
+        showCustomSnackBar(
+          title: 'Error',
+          message: 'User not found, please register',
+          icon: Icons.error,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString(), colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -202,7 +260,14 @@ class LoginController extends GetxController {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-        Get.snackbar('Error', 'Google sign-in canceled', colorText: Colors.red);
+        showCustomSnackBar(
+          title: 'Oops!',
+          message: 'Google sign-in was canceled.',
+          icon: Icons.warning_amber_rounded,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.white,
+          duration: Duration(seconds: 4),
+        );
         return;
       }
 
@@ -235,8 +300,17 @@ class LoginController extends GetxController {
             number: null,
           );
           await doc.set(user.toJson());
-        }
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('documentId', doc.id);
+        } else {
+          // If the user exists, log their document ID
+          print(
+              'User already exists with document ID: ${querySnapshot.docs.first.id}');
 
+          // You can still store the existing document ID in SharedPreferences if you want
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('documentId', querySnapshot.docs.first.id);
+        }
         box.write('loginUser', {
           'name': firebaseUser.displayName,
           'email': firebaseUser.email,
@@ -244,11 +318,22 @@ class LoginController extends GetxController {
 
         Get.offAll(() => BottomNav());
 
-        Get.snackbar('Success', 'Google Sign-In Successful',
-            colorText: Colors.green);
+        showCustomSnackBar(
+          title: 'Success',
+          message: 'Google Sign-In Successful',
+          icon: Icons.check_circle,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString(), colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -259,7 +344,40 @@ class LoginController extends GetxController {
       box.remove('loginUser');
       Get.offAll(() => Login());
     } catch (e) {
-      Get.snackbar('Error', 'Logout failed: $e', colorText: Colors.red);
+      showCustomSnackBar(
+        title: 'Error',
+        message: 'Logout failed: $e',
+        icon: Icons.error,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
     }
+  }
+
+  void showCustomSnackBar({
+    required String title,
+    required String message,
+    IconData? icon,
+    Color backgroundColor = Colors.redAccent,
+    Color textColor = Colors.white,
+    SnackPosition position = SnackPosition.BOTTOM,
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    Get.snackbar(
+      title,
+      message,
+      icon: icon != null ? Icon(icon, color: textColor) : null,
+      snackPosition: position,
+      backgroundColor: backgroundColor,
+      colorText: textColor,
+      borderRadius: 12,
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      duration: duration,
+      isDismissible: true,
+      forwardAnimationCurve: Curves.easeOutBack,
+      overlayBlur: 1.5,
+      overlayColor: Colors.black.withOpacity(0.2),
+    );
   }
 }
