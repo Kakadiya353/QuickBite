@@ -55,7 +55,8 @@ class _DetailsState extends State<Details> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          margin: EdgeInsets.only(left: 20.0, top: 50.0, right: 20.0),
+          margin:
+              EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0, bottom: 0.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -176,7 +177,8 @@ class _DetailsState extends State<Details> {
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width / 2,
-                      padding: EdgeInsets.all(3),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                           color: Colors.grey,
                           borderRadius: BorderRadius.circular(10)),
@@ -184,22 +186,26 @@ class _DetailsState extends State<Details> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           GestureDetector(
-                            onDoubleTap: () async {
-                              await addData();
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CartScreen()),
-                              );
-                            },
-                            child: Text(
-                              "Add to cart",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins',
-                                  fontSize: 18.0),
-                            ),
-                          ),
+                              onTap: () async {
+                                await addData();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CartScreen()),
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(
+                                    5.0), // adjust the value as needed
+                                child: Text(
+                                  "Add to cart",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins',
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                              )),
                           SizedBox(width: 30.0),
                           Icon(Icons.shopping_cart_outlined,
                               color: Colors.white),
