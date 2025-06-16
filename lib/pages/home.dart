@@ -60,13 +60,23 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.only(
-            left: 10.0,
-            top: 50.0,
-          ),
+              left: screenWidth * 0.03, top: screenHeight * 0.02),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -74,33 +84,32 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Hello there",
+                    "Hello, there",
                     style: AppWidget.boldTextFieldStyle(context),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return CartScreen();
-                      }));
+                            return CartScreen();
+                          }));
                     },
                     child: Container(
-                      margin: EdgeInsets.only(right: 20.0),
-                      padding: EdgeInsets.all(3),
+                      margin: EdgeInsets.only(right: screenWidth * 0.05),
+                      padding: EdgeInsets.all(screenWidth * 0.02),
                       decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(3)),
+                        color: theme.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                       child: Icon(
                         Icons.shopping_cart,
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                       ),
                     ),
                   )
                 ],
               ),
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: screenHeight * 0.02),
               Text(
                 "Delicious Food",
                 style: AppWidget.HeadLineTextFieldStyle(context),
@@ -109,15 +118,12 @@ class _HomeState extends State<Home> {
                 "Discover and Get Great Food",
                 style: AppWidget.LigthTextFieldStyle(context),
               ),
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: screenHeight * 0.03),
               Container(
-                  margin: EdgeInsets.only(right: 20.0), child: showItem()),
-              SizedBox(
-                height: 30.0,
+                margin: EdgeInsets.only(right: screenWidth * 0.05),
+                child: showItem(),
               ),
-              // Ensure foodStream is not null before passing to StreamBuilder
+              SizedBox(height: screenHeight * 0.05),
               StreamBuilder<QuerySnapshot>(
                 stream: foodStream,
                 builder: (context, snapshot) {
@@ -129,12 +135,13 @@ class _HomeState extends State<Home> {
                     return const Center(
                         child: Text("No food items available."));
                   }
+
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: snapshot.data!.docs.map((doc) {
                         Map<String, dynamic> data =
-                            doc.data() as Map<String, dynamic>;
+                        doc.data() as Map<String, dynamic>;
 
                         return GestureDetector(
                           onTap: () async {
@@ -147,7 +154,6 @@ class _HomeState extends State<Home> {
                               selectedCategory,
                             );
 
-                            // Navigate only after data is stored
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -156,46 +162,52 @@ class _HomeState extends State<Home> {
                             );
                           },
                           child: Container(
-                            margin: const EdgeInsets.all(10),
+                            margin: EdgeInsets.all(screenWidth * 0.03),
                             child: Material(
                               elevation: 5.0,
                               borderRadius: BorderRadius.circular(25),
                               shadowColor: Colors.grey.shade100,
+                              color: theme.cardColor,
                               child: Container(
-                                padding: const EdgeInsets.all(15),
+                                padding: EdgeInsets.all(screenWidth * 0.03),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ClipRRect(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(30.0),
-                                          bottomRight: Radius.circular(30.0),
-                                          topRight: Radius.circular(10.0),
-                                          bottomLeft: Radius.circular(10.0)),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      // Rounded corners for a cleaner look
                                       child: CachedNetworkImage(
                                         imageUrl: data['ImagePath'],
                                         placeholder: (context, url) =>
-                                            CircularProgressIndicator(),
+                                            Center(
+                                              child: CircularProgressIndicator(),
+                                            ),
                                         errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                        height: 155.0,
-                                        width: 155.0,
-                                        fit: BoxFit.cover,
+                                            Icon(
+                                              Icons.error,
+                                              color: theme.colorScheme.error,
+                                            ),
+                                        height: screenHeight * 0.15,
+                                        // Adjust the height to be more proportionate
+                                        width: screenWidth * 0.3,
+                                        // Adjust the width for a balanced look
+                                        fit: BoxFit
+                                            .cover, // Maintain aspect ratio while covering the container
                                       ),
                                     ),
-                                    const SizedBox(height: 5.0),
+                                    SizedBox(height: 5.0),
                                     Text(
                                       data['Name'],
                                       style: AppWidget.semiBoldTextFieldStyle(
                                           context),
                                     ),
-                                    const SizedBox(height: 5.0),
+                                    SizedBox(height: 5.0),
                                     Text(
                                       _limitWords(data['Detail'], 12),
                                       style: AppWidget.LigthTextFieldStyle(
                                           context),
                                     ),
-                                    const SizedBox(height: 5.0),
+                                    SizedBox(height: 5.0),
                                     Text(
                                       "\$${data['Price'].toString()}",
                                       style: AppWidget.shortTextFieldStyle(
@@ -212,10 +224,7 @@ class _HomeState extends State<Home> {
                   );
                 },
               ),
-              SizedBox(
-                height: 30.0,
-              ),
-              // Example for a static salad item.
+              SizedBox(height: screenHeight * 0.05),
               StreamBuilder(
                 stream: filterStream,
                 builder: (context, snapshot) {
@@ -223,20 +232,17 @@ class _HomeState extends State<Home> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  //Debug Logs for filtered category
-                  print(
-                      "Stream data for $selectedCategory: ${snapshot.data?.docs.length}");
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return const Center(
-                      child: Text('No food items available.'),
-                    );
+                        child: Text('No food items available.'));
                   }
+
                   return SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Column(
                       children: snapshot.data!.docs.map((doc) {
                         Map<String, dynamic> data =
-                            doc.data() as Map<String, dynamic>;
+                        doc.data() as Map<String, dynamic>;
 
                         return GestureDetector(
                           onTap: () async {
@@ -249,22 +255,21 @@ class _HomeState extends State<Home> {
                                 selectedCategory);
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return Details(selectedCategory);
-                            }));
+                                  return Details(selectedCategory);
+                                }));
                           },
                           child: Container(
                             margin: EdgeInsets.only(
-                                right: 10.0, left: 10.0, top: 15.0),
+                                right: screenWidth * 0.03,
+                                left: screenWidth * 0.03,
+                                top: screenHeight * 0.02),
                             child: Material(
                               elevation: 5.0,
                               shadowColor: Colors.grey.shade100,
+                              color: theme.cardColor,
                               borderRadius: BorderRadius.circular(20.0),
                               child: Container(
-                                padding: EdgeInsets.only(
-                                    top: 5.0,
-                                    left: 8.0,
-                                    right: 8.0,
-                                    bottom: 5.0),
+                                padding: EdgeInsets.all(screenWidth * 0.02),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -275,56 +280,44 @@ class _HomeState extends State<Home> {
                                         placeholder: (context, url) =>
                                             CircularProgressIndicator(),
                                         errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                        height: 130.0,
-                                        width: 130.0,
+                                            Icon(Icons.error,
+                                                color: theme.colorScheme.error),
+                                        height: screenHeight * 0.17,
+                                        width: screenWidth * 0.4,
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                    SizedBox(
-                                      width: 20.0,
-                                    ),
+                                    SizedBox(width: screenWidth * 0.05),
                                     Column(
                                       children: [
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              2,
+                                          width: screenWidth * 0.4,
                                           child: Text(
                                             data['Name'],
                                             style: AppWidget
                                                 .semiBoldTextFieldStyle(
-                                                    context),
+                                                context),
                                           ),
                                         ),
-                                        SizedBox(
-                                          height: 20.0,
-                                        ),
+                                        SizedBox(height: screenHeight * 0.02),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              2,
+                                          width: screenWidth * 0.4,
                                           child: Text(
                                             data['Detail'],
                                             style:
-                                                AppWidget.LigthTextFieldStyle(
-                                                    context),
+                                            AppWidget.LigthTextFieldStyle(
+                                                context),
                                           ),
                                         ),
                                         Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              2,
+                                          width: screenWidth * 0.4,
                                           child: Text(
                                             "\$${data['Price'].toString()}",
                                             style: AppWidget
                                                 .semiBoldTextFieldStyle(
-                                                    context),
+                                                context),
                                           ),
-                                        )
+                                        ),
                                       ],
                                     )
                                   ],
@@ -342,8 +335,8 @@ class _HomeState extends State<Home> {
                 child: Text(
                   "© QuickBite",
                   style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.black,
+                    fontSize: screenHeight * 0.02,
+                    color: theme.textTheme.bodySmall!.color,
                   ),
                 ),
               )
@@ -410,7 +403,7 @@ class _HomeState extends State<Home> {
     List<String> words = text.split(''); // Split the text into words
     return words.length > wordLimit
         ? words.take(wordLimit).join(' ') +
-            '...' // Limit to 20 words and add ellipsis
+        '...' // Limit to 20 words and add ellipsis
         : text; // If less than 20 words, return the text as is
   }
 
