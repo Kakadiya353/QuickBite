@@ -12,98 +12,105 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return GetBuilder<LoginController>(builder: (ctrl) {
       return Scaffold(
-        body: Stack(
-          children: [
-            // Top gradient background
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 2.5,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFff5c30),
-                    Color(0xFFe74b1a),
-                  ],
-                ),
-              ),
-            ),
-
-            // Bottom white container
-            Container(
-              margin: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height / 3,
-              ),
-              height: MediaQuery.of(context).size.height / 2,
-              width: MediaQuery.of(context).size.width,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-              ),
-            ),
-
-            // Main content
-            SingleChildScrollView(
-              child: Container(
-                margin: const EdgeInsets.only(top: 30.0),
-                child: Column(
-                  children: [
-                    // Logo
-                    Center(
-                      child: Image.asset(
-                        "images/logofast.png",
-                        width: MediaQuery.of(context).size.width / 1.5,
-                        fit: BoxFit.cover,
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: screenHeight),
+              child: Column(
+                children: [
+                  // Top gradient background with logo
+                  Container(
+                    width: screenWidth,
+                    height: screenHeight * 0.35,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFFff5c30), Color(0xFFe74b1a)],
+                      ),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
                       ),
                     ),
-                    const SizedBox(height: 100),
+                    child: Center(
+                      child: Image.asset(
+                        "images/logofast.png",
+                        width: screenWidth * 0.5,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
 
-                    // Welcome text and form
-                    Column(
+                  const SizedBox(height: 30),
+
+                  // Register title
+                  Text(
+                    'Create Your Account !!',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onBackground,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
                       children: [
-                        const SizedBox(height: 50),
-                        const Text(
-                          'Create Your Account !!',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
                         // Name input
                         TextField(
-                          keyboardType: TextInputType.text,
                           controller: ctrl.registerNameCtrl,
+                          keyboardType: TextInputType.text,
+                          style:
+                              TextStyle(color: theme.colorScheme.onBackground),
                           decoration: InputDecoration(
+                            filled: true,
+                            fillColor: theme.colorScheme.surface,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            prefixIcon: const Icon(Icons.person),
+                            prefixIcon: Icon(Icons.person,
+                                color: theme.colorScheme.primary),
                             labelText: 'Your Name',
+                            labelStyle:
+                                TextStyle(color: theme.colorScheme.primary),
                             hintText: 'Enter Your Name',
+                            hintStyle: TextStyle(
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.6)),
                           ),
                         ),
                         const SizedBox(height: 20),
 
                         // Mobile number input
                         TextField(
-                          keyboardType: TextInputType.phone,
                           controller: ctrl.registerNumberCtrl,
+                          keyboardType: TextInputType.phone,
+                          style:
+                              TextStyle(color: theme.colorScheme.onBackground),
                           decoration: InputDecoration(
+                            filled: true,
+                            fillColor: theme.colorScheme.surface,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            prefixIcon: const Icon(Icons.phone_android),
+                            prefixIcon: Icon(Icons.phone_android,
+                                color: theme.colorScheme.primary),
                             labelText: 'Mobile Number',
-                            hintText: 'Enter Your mobile number',
+                            labelStyle:
+                                TextStyle(color: theme.colorScheme.primary),
+                            hintText: 'Enter Your Mobile Number',
+                            hintStyle: TextStyle(
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.6)),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -119,37 +126,51 @@ class _RegisterState extends State<Register> {
                         const SizedBox(height: 20),
 
                         // Register or Send OTP button
-                        ElevatedButton(
-                          onPressed: () {
-                            if (ctrl.otpFieldShown) {
-                              ctrl.addUser();
-                            } else {
-                              ctrl.sendOtp();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.redAccent,
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (ctrl.otpFieldShown) {
+                                ctrl.addUser();
+                              } else {
+                                ctrl.sendOtp();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                                ctrl.otpFieldShown ? 'Register' : 'Send OTP'),
                           ),
-                          child: Text(
-                              ctrl.otpFieldShown ? 'Register' : 'Send OTP'),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 16),
 
                         // Navigate to Login page
                         TextButton(
                           onPressed: () {
                             Get.to(Login());
                           },
-                          child: const Text('Login'),
+                          child: Text(
+                            'Already have an account? Login',
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
                         ),
+                        const SizedBox(height: 30),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       );
     });
