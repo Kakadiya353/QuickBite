@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickbite/controller/userID.dart';
-import 'package:quickbite/widget/widget_support.dart';
 
 class Order extends StatefulWidget {
   const Order({super.key});
@@ -21,7 +20,6 @@ class _OrderState extends State<Order> {
 
   Future<void> _getUserID() async {
     String? id = await getUserId();
-
     setState(() {
       userID = id;
     });
@@ -29,10 +27,24 @@ class _OrderState extends State<Order> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text('My Orders')),
+      appBar: AppBar(
+        title: const Text(
+          'My Orders',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: colorScheme.primary,
+        elevation: 4,
+      ),
       body: userID == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('Order')
@@ -43,75 +55,141 @@ class _OrderState extends State<Order> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Text("No orders found"));
+                  return Center(
+                    child: Text(
+                      "No orders found",
+                      style: textTheme.bodyLarge?.copyWith(
+                        fontFamily: 'Poppins',
+                        fontSize: 18,
+                      ),
+                    ),
+                  );
                 }
 
                 var orders = snapshot.data!.docs;
 
                 return ListView.builder(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
                     var order = orders[index].data() as Map<String, dynamic>;
                     var items = order['items'] as List<dynamic>;
 
                     return Card(
-                      // color: const Color.fromARGB(255, 160, 160, 160),
-                      color: Color(0XFFB4B4B4).withOpacity(0.4),
-                      elevation: 10,
+                      color: colorScheme.surface,
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 8),
                       child: Padding(
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ListTile(
-                              tileColor:
-                                  const Color.fromARGB(255, 255, 255, 255),
-                              title: Text('Order Summary',
-                                  style: AppWidget.font(context)),
-                              subtitle: Text('Order ID: ${orders[index].id}',
-                                  style: AppWidget.font(context)),
-                              leading:
-                                  Text('🛒', style: TextStyle(fontSize: 25)),
-                            ),
-                            SizedBox(height: 16),
-                            ListTile(
-                              title: Text('Items Ordered',
-                                  style: AppWidget.font(context)),
-                              leading:
-                                  Text('📦', style: TextStyle(fontSize: 20)),
-                            ),
-                            SizedBox(height: 8),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 35),
-                              child: Container(
-                                constraints: BoxConstraints(maxHeight: 200),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: ClampingScrollPhysics(),
-                                  itemCount: items.length,
-                                  itemBuilder: (context, itemIndex) {
-                                    var item = items[itemIndex]
-                                        as Map<String, dynamic>;
-                                    return ListTile(
-                                      title: Text(item['ItemCategory']),
-                                      subtitle: Text(
-                                          'Price: \$${item['TotalPrice']}'),
-                                      contentPadding: EdgeInsets.zero,
-                                    );
-                                  },
+                            Row(
+                              children: [
+                                Icon(Icons.shopping_cart,
+                                    color: colorScheme.primary, size: 28),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Order Summary',
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Order ID: ${orders[index].id}',
+                              style: textTheme.bodySmall?.copyWith(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                color: colorScheme.onSurface.withOpacity(0.6),
                               ),
                             ),
-                            SizedBox(height: 16),
+                            const Divider(height: 24, thickness: 1),
+                            Text(
+                              'Items Ordered:',
+                              style: textTheme.bodyLarge?.copyWith(
+                                fontFamily: 'Poppins',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              constraints: const BoxConstraints(maxHeight: 200),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const ClampingScrollPhysics(),
+                                itemCount: items.length,
+                                itemBuilder: (context, itemIndex) {
+                                  var item =
+                                      items[itemIndex] as Map<String, dynamic>;
+                                  return ListTile(
+                                    leading: Icon(Icons.check_circle,
+                                        color: colorScheme.primary),
+                                    title: Text(
+                                      item['ItemCategory'],
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      'Price: \$${(item['TotalPrice'] as num).toStringAsFixed(2)}',
+                                      style: textTheme.bodySmall?.copyWith(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        color: colorScheme.onSurface
+                                            .withOpacity(0.6),
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.zero,
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Total Price: \$${order['TotalPrice']}'),
-                                Text('Order Date: ${order['Date']}'),
+                                Row(
+                                  children: [
+                                    Icon(Icons.attach_money,
+                                        color: colorScheme.primary),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Total: \$${(order['TotalPrice'] as num).toStringAsFixed(2)}',
+                                      style: textTheme.bodyLarge?.copyWith(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.calendar_today,
+                                        color: colorScheme.primary, size: 18),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Date: ${order['Date']}',
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ],
