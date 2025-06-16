@@ -28,97 +28,119 @@ class _OnBoardState extends State<OnBoard> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final horizontalPadding = size.width * 0.05; // 5%
+    final topPadding = size.height * 0.05; // 5%
+    final imageHeight = size.height * 0.4; // 40%
+
     return Scaffold(
       body: Column(
         children: [
           Expanded(
             child: PageView.builder(
-                controller: _controller,
-                itemCount: contents.length,
-                onPageChanged: (int index) {
-                  setState(() {
-                    currentIndex = index;
-                  });
-                },
-                itemBuilder: (_, i) {
-                  return Padding(
-                    padding:
-                        EdgeInsets.only(top: 40.0, left: 20.0, right: 20.0),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          contents[i].image,
-                          height: 450,
-                          width: MediaQuery.of(context).size.width,
-                          fit: BoxFit.cover,
+              controller: _controller,
+              itemCount: contents.length,
+              onPageChanged: (int index) {
+                setState(() {
+                  currentIndex = index;
+                });
+              },
+              itemBuilder: (_, i) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    top: topPadding,
+                    left: horizontalPadding,
+                    right: horizontalPadding,
+                  ),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        contents[i].image,
+                        height: imageHeight,
+                        width: size.width,
+                        fit: BoxFit.cover,
+                      ),
+                      SizedBox(height: size.height * 0.03),
+                      Text(
+                        contents[i].title,
+                        textAlign: TextAlign.center,
+                        style:
+                            AppWidget.semiBoldTextFieldStyle(context).copyWith(
+                          fontSize: size.width * 0.06, // 6% of width
                         ),
-                        SizedBox(
-                          height: 40.0,
+                      ),
+                      SizedBox(height: size.height * 0.02),
+                      Text(
+                        contents[i].description,
+                        textAlign: TextAlign.center,
+                        style: AppWidget.LigthTextFieldStyle(context).copyWith(
+                          fontSize: size.width * 0.045, // 4.5% of width
                         ),
-                        Text(
-                          contents[i].title,
-                          style: AppWidget.semiBoldTextFieldStyle(context),
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        Text(
-                          contents[i].description,
-                          style: AppWidget.LigthTextFieldStyle(context),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                contents.length,
-                (index) => buildDot(index, context),
-              ),
+          SizedBox(height: size.height * 0.02),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              contents.length,
+              (index) => buildDot(index),
             ),
           ),
           GestureDetector(
             onTap: () {
               if (currentIndex == contents.length - 1) {
                 Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => Login()));
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              } else {
+                _controller.nextPage(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
               }
-              _controller.nextPage(
-                  duration: Duration(milliseconds: 100),
-                  curve: Curves.bounceIn);
             },
             child: Container(
               decoration: BoxDecoration(
-                  color: Colors.red, borderRadius: BorderRadius.circular(20.0)),
-              height: 60,
-              margin: EdgeInsets.all(40),
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              height: size.height * 0.07,
+              // 7% of height
+              margin: EdgeInsets.all(size.width * 0.08),
               width: double.infinity,
               child: Center(
                 child: Text(
                   currentIndex == contents.length - 1 ? "Start" : "Next",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    fontSize: size.width * 0.05, // 5% of width
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Container buildDot(int index, BuildContext context) {
-    return Container(
+  Widget buildDot(int index) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
       height: 10.0,
-      width: currentIndex == index ? 18 : 7,
+      width: currentIndex == index ? 20 : 8,
       margin: EdgeInsets.only(right: 5),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6), color: Colors.black38),
+        borderRadius: BorderRadius.circular(5),
+        color: currentIndex == index ? Colors.red : Colors.black38,
+      ),
     );
   }
 }
